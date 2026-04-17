@@ -1,37 +1,38 @@
-#include<bits/stdc++.h>
-using namespace std;
-
 class Solution {
 public:
-    int findCheapestPrice(int n, vector<vector<int>>& flights, int src, int dst, int k) {
-        vector<vector<pair<int, int>>> graph(n);
-        for (auto& flight : flights) {
-            graph[flight[0]].push_back({flight[1], flight[2]});
-        }
-
-        queue<vector<int>> q; // {city, cost, stops}
-        q.push({src, 0, 0});
-
-        vector<int> minCost(n, INT_MAX);
-        minCost[src] = 0;
-
-        while (!q.empty()) {
-            auto current = q.front();
-            q.pop();
-            int city = current[0], cost = current[1], stops = current[2];
-
-            if (stops > k) continue;
-
-            for (auto& neighbor : graph[city]) {
-                int nextCity = neighbor.first;
-                int price = neighbor.second;
-                if (cost + price < minCost[nextCity]) {
-                    minCost[nextCity] = cost + price;
-                    q.push({nextCity, cost + price, stops + 1});
-                }
+    string shortestCommonSupersequence(string str1, string str2) {
+        int n=str1.size(),m=str2.size();
+        vector<vector<int>>dp(n+1,vector<int>(m+1,0));
+        for(int i=1;i<=n;i++){
+            for(int j=1;j<=m;j++){
+                if (str1[i-1]==str2[j-1]) dp[i][j]=1+dp[i-1][j-1];
+                else dp[i][j]=max(dp[i-1][j],dp[i][j-1]);
             }
         }
-
-        return minCost[dst] == INT_MAX ? -1 : minCost[dst];
+        int i=n,j=m;
+        string ans="";
+        while(i>0 && j>0) {
+            if(str1[i-1]==str2[j-1]){
+                ans+=str1[i-1];
+                i--; 
+                j--;
+            }else if(dp[i-1][j]>dp[i][j-1]){
+                ans+=str1[i-1];
+                i--;
+            } else{
+                ans+=str2[j-1];
+                j--;
+            }
+        }
+        while (i>0) {
+            ans+=str1[i-1];
+            i--;
+        }
+        while (j>0) {
+            ans+=str2[j-1];
+            j--;
+        }
+        reverse(ans.begin(),ans.end());
+        return ans;
     }
 };
